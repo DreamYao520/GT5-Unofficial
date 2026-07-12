@@ -447,7 +447,8 @@ public class OverclockCalculator {
             while (eutOverclock * 4.0 < machinePower && regularOverclocks < maxRegularOverclocks) {
                 eutOverclock *= 4.0;
                 regularOverclocks++;
-                if (duration / GTUtility.powInt(durationDecreasePerOC, overclocks) < 2 && neededOverclocks == 0) {
+                if (duration / GTUtility.powInt(durationDecreasePerOC, regularOverclocks) < 2
+                    && neededOverclocks == 0) {
                     neededOverclocks = regularOverclocks;
                 }
             }
@@ -457,13 +458,15 @@ public class OverclockCalculator {
             while (eutOverclock * (4.0 + 0.3 * (laserOverclocks + 1)) < machinePower) {
                 eutOverclock *= (4.0 + 0.3 * (laserOverclocks + 1));
                 laserOverclocks++;
-                if (duration / GTUtility.powInt(durationDecreasePerOC, overclocks) < 2 && neededOverclocks == 0) {
-                    neededOverclocks = overclocks + laserOverclocks;
+                if (duration / GTUtility.powInt(durationDecreasePerOC, regularOverclocks + laserOverclocks) < 2
+                    && neededOverclocks == 0) {
+                    neededOverclocks = regularOverclocks + laserOverclocks;
                 }
             }
 
             final int overclocks = regularOverclocks + laserOverclocks;
-            return GTUtility.powInt(durationDecreasePerOC, Math.max(neededOverclocks - overclocks, 0));
+            if (neededOverclocks == 0) return 1.0;
+            return GTUtility.powInt(durationDecreasePerOC, Math.max(overclocks - neededOverclocks, 0));
         }
 
         // Limit overclocks allowed by power tier or voltage tier depending on whether amperage overclocks are used.

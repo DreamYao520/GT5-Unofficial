@@ -330,7 +330,6 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
                 EnumChatFormatting.AQUA + "Power usage = Multiplier × (Active Slices) × (Recipe EU/t)"
                     + EnumChatFormatting.GRAY)
             .addInfo("Overclocking assumes all recipe slices are active")
-            .addInfo(EnumChatFormatting.BOLD + "Does not overclock beyond 1 tick")
             .addSeparator(EnumChatFormatting.GOLD, 67)
             .addInfo("Constructed identically to the Assembly Line")
             .addSupportAny()
@@ -777,19 +776,15 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
             int maxRegularOverclock = getTier(inputVoltage) - getTier(recipe.mEUt);
 
             // Delete this one before enable overclocking under one tick.
-            int maxOverclockTo1Tick = GTUtility.log2(recipe.mDuration / recipe.mInputs.length);
 
             OverclockCalculator calculator = new OverclockCalculator().setRecipeEUt(recipe.mEUt)
                 .setDurationUnderOneTickSupplier(() -> ((double) (recipe.mDuration) / recipe.mInputs.length))
                 .setParallel(originalMaxParallel)
                 .setEUt(inputEUt / recipe.mInputs.length)
                 .setLaserOC(true)
-                .setMaxRegularOverclocks(Math.min(maxRegularOverclock, maxOverclockTo1Tick));
+                .setMaxRegularOverclocks(maxRegularOverclock);
 
-            // Disabled to disable overclocking under one tick.
-            /*
-             * maxParallel = GTUtility.safeInt((long) (maxParallel * calculator.calculateMultiplierUnderOneTick()), 0);
-             */
+            maxParallel = GTUtility.safeInt((long) (maxParallel * calculator.calculateMultiplierUnderOneTick()), 0);
 
             int maxParallelBeforeBatchMode = maxParallel;
             if (isBatchModeEnabled()) {
