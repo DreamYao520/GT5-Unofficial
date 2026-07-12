@@ -202,6 +202,7 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
     private int currentInputLength;
     private String lastStopReason = "";
     private int currentRecipeParallel = 1;
+    private int parallelForEnergy = 1;
 
     public MTEAdvAssLine(int aID, String aName, String aNameRegional) {
         super(aID, aName, aNameRegional);
@@ -324,10 +325,10 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
             .addInfo("Additional overclocks are increasingly more expensive")
             .addInfo(
                 EnumChatFormatting.AQUA
-                    + "Multiplier = 4^(Regular Overclocks) × 4.3 × 4.6 × … × (4 + 0.3 × Extra Overclocks)"
+                    + "Multiplier = 4^(Regular Overclocks) 脳 4.3 脳 4.6 脳 鈥?脳 (4 + 0.3 脳 Extra Overclocks)"
                     + EnumChatFormatting.GRAY)
             .addInfo(
-                EnumChatFormatting.AQUA + "Power usage = Multiplier × (Active Slices) × (Recipe EU/t)"
+                EnumChatFormatting.AQUA + "Power usage = Multiplier 脳 (Active Slices) 脳 (Recipe EU/t)"
                     + EnumChatFormatting.GRAY)
             .addInfo("Overclocking assumes all recipe slices are active")
             .addSeparator(EnumChatFormatting.GOLD, 67)
@@ -387,6 +388,7 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
         currentRecipe = null;
         currentInputLength = -1;
         currentRecipeParallel = 1;
+        parallelForEnergy = 1;
         stuck = false;
         baseEUt = 0;
         for (Slice slice : slices) {
@@ -640,7 +642,7 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
             }
             if (slice.progress > 0) working++;
         }
-        lEUt = working * baseEUt;
+        lEUt = parallelForEnergy * working * baseEUt;
 
         if (lEUt > 0) {
             // overflow again :(
@@ -829,6 +831,7 @@ public class MTEAdvAssLine extends MTEExtendedPowerMultiBlockBase<MTEAdvAssLine>
             }
 
             int currentParallelBeforeBatchMode = Math.min(currentParallel, maxParallelBeforeBatchMode);
+            parallelForEnergy = currentParallelBeforeBatchMode;
 
             calculator.setCurrentParallel(currentParallelBeforeBatchMode)
                 .calculate();

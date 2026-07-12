@@ -465,8 +465,11 @@ public class OverclockCalculator {
             }
 
             final int overclocks = regularOverclocks + laserOverclocks;
-            if (neededOverclocks == 0) return 1.0;
-            return GTUtility.powInt(durationDecreasePerOC, Math.max(overclocks - neededOverclocks, 0));
+            double speedMul = neededOverclocks > 0
+                ? GTUtility.powInt(durationDecreasePerOC, overclocks - neededOverclocks)
+                : 1.0;
+            double powerMul = Math.max(1.0, machinePower / Math.max(eutOverclock, 1));
+            return Math.max(speedMul, powerMul);
         }
 
         // Limit overclocks allowed by power tier or voltage tier depending on whether amperage overclocks are used.
